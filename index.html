@@ -1,0 +1,945 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Vaulx is a private, local-first expense tracker with smart budgets, loyalty cards, spending insights and gamified progress.">
+  <meta name="theme-color" content="#050712">
+  <title>Vaulx | Track More, Guess Less</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #050712;
+      --bg-deep: #02040a;
+      --surface: rgba(15, 21, 34, 0.76);
+      --surface-solid: #0f1522;
+      --line: rgba(202, 216, 255, 0.14);
+      --text: #f7f8fc;
+      --muted: #9da8b9;
+      --cyan: #24e2c1;
+      --blue: #4da6ff;
+      --violet: #a765ff;
+      --pink: #ec5daf;
+      --orange: #ff8a31;
+      --danger: #ff5d68;
+      --radius: 28px;
+      --shadow: 0 34px 100px rgba(0, 0, 0, 0.5);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      overflow-x: hidden;
+      font-family: "Segoe UI Variable Display", "Bahnschrift", "Trebuchet MS", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 4% 12%, rgba(98, 59, 255, 0.22), transparent 26rem),
+        radial-gradient(circle at 96% 24%, rgba(0, 214, 190, 0.16), transparent 30rem),
+        linear-gradient(180deg, var(--bg) 0%, var(--bg-deep) 100%);
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      opacity: 0.18;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+      background-size: 72px 72px;
+      mask-image: linear-gradient(to bottom, black, transparent 88%);
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button, input, textarea { font: inherit; }
+    img { display: block; max-width: 100%; }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      min-height: 76px;
+      padding: 14px clamp(18px, 4vw, 64px);
+      background: rgba(5, 7, 18, 0.82);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(20px);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      flex: 0 0 auto;
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      border-radius: 50%;
+      color: white;
+      font-size: 1.6rem;
+      font-weight: 800;
+      background:
+        radial-gradient(circle at 40% 30%, rgba(255, 255, 255, 0.28), transparent 28%),
+        linear-gradient(145deg, #22283a, #080a13);
+      box-shadow:
+        -4px 0 16px rgba(77, 166, 255, 0.4),
+        4px 0 16px rgba(167, 101, 255, 0.42);
+    }
+
+    .brand-copy strong {
+      display: block;
+      font-size: 1.25rem;
+      letter-spacing: 0.08em;
+    }
+
+    .brand-copy small {
+      display: block;
+      margin-top: 1px;
+      color: var(--muted);
+      font-size: 0.67rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: clamp(12px, 2.5vw, 30px);
+      color: #c3cad5;
+      font-size: 0.9rem;
+      font-weight: 650;
+    }
+
+    nav a { transition: color 180ms ease; }
+    nav a:hover { color: var(--cyan); }
+
+    .page-shell {
+      width: min(100%, 1480px);
+      margin-inline: auto;
+      padding-inline: clamp(18px, 4vw, 64px);
+    }
+
+    .hero {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, 0.88fr) minmax(340px, 1.12fr);
+      align-items: center;
+      gap: clamp(38px, 6vw, 94px);
+      min-height: calc(100vh - 76px);
+      padding-block: clamp(72px, 9vw, 128px);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: 4%;
+      bottom: 8%;
+      width: 28rem;
+      height: 28rem;
+      z-index: -1;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(45, 214, 255, 0.16), transparent 66%);
+      filter: blur(20px);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      margin: 0 0 22px;
+      color: var(--cyan);
+      font-size: 0.76rem;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 34px;
+      height: 2px;
+      border-radius: 2px;
+      background: linear-gradient(90deg, var(--cyan), var(--violet));
+    }
+
+    h1, h2, h3, p { overflow-wrap: anywhere; }
+
+    h1 {
+      margin: 0;
+      max-width: 780px;
+      font-size: clamp(3.4rem, 7.6vw, 7.6rem);
+      line-height: 0.91;
+      letter-spacing: -0.065em;
+    }
+
+    h1 .gradient,
+    h2 .gradient {
+      color: transparent;
+      background: linear-gradient(95deg, var(--cyan), #77c8ff 48%, var(--violet));
+      background-clip: text;
+      -webkit-background-clip: text;
+    }
+
+    .hero-copy > p:not(.eyebrow) {
+      max-width: 650px;
+      margin: 30px 0 0;
+      color: #c2cad5;
+      font-size: clamp(1.02rem, 1.7vw, 1.3rem);
+      line-height: 1.7;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 34px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 52px;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      padding: 0 22px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+    }
+
+    .button:hover { transform: translateY(-2px); }
+
+    .button.primary {
+      color: #03100e;
+      background: linear-gradient(100deg, var(--cyan), #86f5d9);
+      box-shadow: 0 16px 42px rgba(36, 226, 193, 0.2);
+    }
+
+    .button.ghost {
+      color: white;
+      border-color: rgba(255, 255, 255, 0.18);
+      background: rgba(255, 255, 255, 0.045);
+    }
+
+    .button.full { width: 100%; }
+
+    .trust-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin-top: 28px;
+    }
+
+    .trust-row span {
+      padding: 9px 13px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.035);
+      font-size: 0.82rem;
+    }
+
+    .hero-visual {
+      position: relative;
+      display: grid;
+      place-items: center;
+      min-width: 0;
+    }
+
+    .hero-poster {
+      width: min(100%, 470px);
+      height: auto;
+      object-fit: contain;
+      border: 1px solid rgba(185, 194, 255, 0.2);
+      border-radius: 32px;
+      box-shadow: var(--shadow);
+      transform: rotate(1.6deg);
+      transition: transform 500ms cubic-bezier(.2,.8,.2,1);
+    }
+
+    .hero-poster:hover { transform: rotate(0deg) translateY(-8px); }
+
+    .float-chip {
+      position: absolute;
+      left: -4%;
+      bottom: 12%;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 12px 16px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 999px;
+      color: white;
+      background: rgba(8, 12, 24, 0.86);
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(16px);
+      font-size: 0.85rem;
+      font-weight: 750;
+    }
+
+    .float-chip b { color: var(--cyan); }
+
+    .section {
+      padding-block: clamp(76px, 9vw, 132px);
+    }
+
+    .section-heading {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 0.62fr);
+      align-items: end;
+      gap: 40px;
+      margin-bottom: clamp(36px, 5vw, 64px);
+    }
+
+    h2 {
+      margin: 0;
+      max-width: 900px;
+      font-size: clamp(2.35rem, 5.2vw, 5.4rem);
+      line-height: 0.98;
+      letter-spacing: -0.055em;
+    }
+
+    .section-heading > p:last-child,
+    .section-copy {
+      margin: 0;
+      color: var(--muted);
+      font-size: 1.04rem;
+      line-height: 1.72;
+    }
+
+    .feature-strip {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .feature-strip article {
+      position: relative;
+      min-height: 190px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 24px;
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.055), transparent 52%),
+        var(--surface);
+      backdrop-filter: blur(18px);
+    }
+
+    .feature-strip article::after {
+      content: "";
+      position: absolute;
+      right: -45px;
+      bottom: -55px;
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      background: var(--glow, rgba(36, 226, 193, 0.2));
+      filter: blur(28px);
+    }
+
+    .feature-number {
+      color: var(--accent, var(--cyan));
+      font-size: 0.76rem;
+      font-weight: 900;
+      letter-spacing: 0.14em;
+    }
+
+    .feature-strip h3 {
+      margin: 34px 0 8px;
+      font-size: 1.22rem;
+    }
+
+    .feature-strip p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.55;
+    }
+
+    .showcase-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 340px));
+      justify-content: center;
+      gap: clamp(22px, 2.5vw, 34px);
+      align-items: start;
+    }
+
+    .showcase-card {
+      position: relative;
+      width: 100%;
+      max-width: 340px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 10px 10px 0;
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.055), transparent 42%),
+        var(--surface-solid);
+      box-shadow: 0 24px 74px rgba(0, 0, 0, 0.28);
+      cursor: zoom-in;
+      isolation: isolate;
+    }
+
+    .showcase-card img {
+      width: auto;
+      max-width: 100%;
+      height: auto;
+      margin-inline: auto;
+      object-fit: contain;
+      border-radius: calc(var(--radius) - 9px);
+      transition: transform 650ms cubic-bezier(.2,.8,.2,1), filter 650ms ease;
+    }
+
+    .showcase-card:hover img {
+      transform: scale(1.012);
+      filter: saturate(1.08);
+    }
+
+    .showcase-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 66px;
+      padding: 14px 12px 15px;
+      color: white;
+    }
+
+    .showcase-meta strong {
+      font-size: 0.9rem;
+      letter-spacing: 0.02em;
+    }
+
+    .showcase-meta span {
+      color: rgba(255, 255, 255, 0.62);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    .privacy-wrap {
+      display: grid;
+      grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr);
+      gap: clamp(32px, 6vw, 84px);
+      padding: clamp(28px, 5vw, 64px);
+      border: 1px solid var(--line);
+      border-radius: 36px;
+      background:
+        radial-gradient(circle at 8% 8%, rgba(36, 226, 193, 0.14), transparent 34%),
+        linear-gradient(145deg, rgba(17, 24, 39, 0.94), rgba(8, 11, 20, 0.94));
+      box-shadow: var(--shadow);
+    }
+
+    .privacy-intro h2 {
+      font-size: clamp(2.3rem, 4.6vw, 4.8rem);
+    }
+
+    .privacy-intro p {
+      color: #bec7d4;
+      line-height: 1.7;
+    }
+
+    .privacy-points {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .privacy-points article {
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.035);
+    }
+
+    .privacy-points h3 {
+      margin: 0 0 8px;
+      font-size: 1rem;
+    }
+
+    .privacy-points p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.58;
+    }
+
+    .support-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 0.72fr) minmax(320px, 1.28fr);
+      align-items: start;
+      gap: clamp(34px, 6vw, 80px);
+    }
+
+    .support-copy {
+      position: sticky;
+      top: 110px;
+    }
+
+    .support-copy h2 { font-size: clamp(2.6rem, 5vw, 5.2rem); }
+
+    .support-copy p {
+      color: var(--muted);
+      line-height: 1.72;
+    }
+
+    .bug-form {
+      display: grid;
+      gap: 12px;
+      border: 1px solid var(--line);
+      border-radius: 30px;
+      padding: clamp(22px, 4vw, 40px);
+      background: var(--surface);
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.28);
+      backdrop-filter: blur(18px);
+    }
+
+    .bug-form label {
+      color: #dfe5ee;
+      font-size: 0.84rem;
+      font-weight: 750;
+    }
+
+    .bug-form input,
+    .bug-form textarea {
+      width: 100%;
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      border-radius: 15px;
+      padding: 14px 15px;
+      color: white;
+      outline: none;
+      background: rgba(3, 6, 14, 0.7);
+      transition: border-color 160ms ease, box-shadow 160ms ease;
+    }
+
+    .bug-form input:focus,
+    .bug-form textarea:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 3px rgba(36, 226, 193, 0.11);
+    }
+
+    .bug-form textarea { resize: vertical; min-height: 130px; }
+
+    .form-note {
+      margin: 2px 0 0;
+      color: #7f8998;
+      font-size: 0.78rem;
+      line-height: 1.5;
+    }
+
+    .site-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      margin-top: 40px;
+      padding: 28px clamp(18px, 4vw, 64px);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--muted);
+      background: rgba(2, 4, 10, 0.8);
+    }
+
+    .site-footer strong { color: white; letter-spacing: 0.08em; }
+
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: none;
+      place-items: center;
+      padding: 24px;
+      background: rgba(0, 2, 8, 0.92);
+      backdrop-filter: blur(18px);
+    }
+
+    .lightbox.open { display: grid; }
+
+    .lightbox img {
+      max-width: min(92vw, 760px);
+      max-height: 92vh;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .lightbox-close {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 50%;
+      color: white;
+      background: rgba(12, 16, 28, 0.9);
+      cursor: pointer;
+    }
+
+    .reveal {
+      opacity: 1;
+      transform: none;
+      transition: opacity 650ms ease, transform 650ms ease;
+    }
+
+    @media (max-width: 1080px) {
+      .hero { grid-template-columns: 1fr 0.92fr; }
+      .feature-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .privacy-wrap { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 760px) {
+      .site-header {
+        min-height: 66px;
+        gap: 12px;
+        padding-inline: 14px;
+      }
+
+      .brand { gap: 9px; }
+      .brand-mark { width: 38px; height: 38px; font-size: 1.4rem; }
+      .brand-copy strong { font-size: 1.08rem; }
+      .brand-copy small { display: none; }
+      nav a:nth-child(1) { display: none; }
+      nav { gap: 14px; font-size: 0.78rem; white-space: nowrap; }
+      .page-shell { padding-inline: 18px; }
+
+      .hero {
+        grid-template-columns: 1fr;
+        min-height: auto;
+        padding-top: 66px;
+      }
+
+      .hero-copy,
+      .hero-copy > p:not(.eyebrow),
+      .hero-actions,
+      .trust-row {
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+      }
+
+      .trust-row span { max-width: 100%; }
+
+      h1 {
+        max-width: 100%;
+        font-size: clamp(2.85rem, 13.4vw, 4.45rem);
+        line-height: 0.95;
+        letter-spacing: -0.055em;
+      }
+      .hero-copy > p:not(.eyebrow) { font-size: 1rem; }
+      .hero-visual { margin-top: 10px; }
+      .hero-poster {
+        width: min(82vw, 320px);
+        height: auto;
+        transform: none;
+        border-radius: 24px;
+      }
+      .float-chip { left: 10px; bottom: 10%; }
+
+      .section-heading,
+      .support-grid { grid-template-columns: 1fr; gap: 18px; }
+
+      .feature-strip,
+      .privacy-points { grid-template-columns: 1fr; }
+
+      .showcase-grid {
+        grid-template-columns: minmax(0, 320px);
+        justify-content: center;
+        gap: 24px;
+      }
+
+      .showcase-card {
+        width: min(100%, 320px);
+        max-width: 320px;
+        padding: 7px 7px 0;
+      }
+      .showcase-meta { min-height: 58px; padding: 12px 10px 13px; }
+
+      .support-copy { position: static; }
+      .site-footer { flex-direction: column; align-items: flex-start; }
+    }
+
+    @media (max-width: 470px) {
+      nav a[href="#support"] { display: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition: none !important; animation: none !important; }
+      .reveal { opacity: 1; transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="Vaulx home">
+      <span class="brand-mark">V</span>
+      <span class="brand-copy">
+        <strong>VAULX</strong>
+        <small>Track More, Guess Less.</small>
+      </span>
+    </a>
+    <nav aria-label="Main navigation">
+      <a href="#product">Product</a>
+      <a href="#privacy">Privacy</a>
+      <a href="#support">Bug report</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero page-shell">
+      <div class="hero-copy reveal">
+        <p class="eyebrow">Private finance companion</p>
+        <h1>Your money.<br><span class="gradient">Your momentum.</span></h1>
+        <p>
+          Track everyday spending, plan budgets, organize loyalty cards and build
+          stronger habits through levels, quests and private on-device insights.
+          No ads. No tracking. No account required.
+        </p>
+        <div class="hero-actions">
+          <a class="button primary" href="#product">Explore Vaulx</a>
+          <a class="button ghost" href="#support">Report a bug</a>
+        </div>
+        <div class="trust-row" aria-label="Vaulx highlights">
+          <span>SQLCipher encrypted</span>
+          <span>Local-first</span>
+          <span>Manual encrypted backup</span>
+          <span>Android 7+</span>
+        </div>
+      </div>
+
+      <div class="hero-visual reveal">
+        <img class="hero-poster" src="assets/vaulx-feature-2.jpg" alt="Vaulx expense calendar and monthly overview" width="942" height="1667">
+      </div>
+    </section>
+
+    <section class="section page-shell">
+      <div class="section-heading reveal">
+        <div>
+          <p class="eyebrow">One system, six strengths</p>
+          <h2>More than an expense list.</h2>
+        </div>
+        <p>
+          Vaulx connects day-to-day tracking with planning, analysis and motivation,
+          while keeping the entire experience fast and personal.
+        </p>
+      </div>
+
+      <div class="feature-strip">
+        <article class="reveal" style="--accent:var(--cyan);--glow:rgba(36,226,193,.22)">
+          <span class="feature-number">01 / TRACK</span>
+          <h3>Daily expense calendar</h3>
+          <p>See totals inside each day and open the exact transactions behind them.</p>
+        </article>
+        <article class="reveal" style="--accent:var(--blue);--glow:rgba(77,166,255,.22)">
+          <span class="feature-number">02 / UNDERSTAND</span>
+          <h3>Visual spending analytics</h3>
+          <p>Compare periods, inspect categories and spot changes before they grow.</p>
+        </article>
+        <article class="reveal" style="--accent:var(--violet);--glow:rgba(167,101,255,.22)">
+          <span class="feature-number">03 / PLAN</span>
+          <h3>Budget and recurring costs</h3>
+          <p>Distribute your monthly budget and account for predictable expenses.</p>
+        </article>
+        <article class="reveal" style="--accent:var(--orange);--glow:rgba(255,138,49,.22)">
+          <span class="feature-number">04 / GROW</span>
+          <h3>Levels, quests and boosts</h3>
+          <p>Turn consistent financial habits into visible, rewarding progress.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="product" class="section page-shell">
+      <div class="section-heading reveal">
+        <div>
+          <p class="eyebrow">Inside Vaulx</p>
+          <h2>Built to be used,<br><span class="gradient">not merely checked.</span></h2>
+        </div>
+        <p>
+          Tap any poster to view it full size. The latest screens cover the complete
+          Vaulx workflow, from daily tracking to loyalty cards.
+        </p>
+      </div>
+
+      <div class="showcase-grid">
+        <article class="showcase-card reveal" data-lightbox="assets/vaulx-feature-2.jpg" tabindex="0" role="button" aria-label="Open expense calendar preview">
+          <img src="assets/vaulx-feature-2.jpg" alt="Vaulx daily expense calendar" loading="lazy" width="942" height="1667">
+          <div class="showcase-meta"><strong>Expense calendar</strong><span>Daily control</span></div>
+        </article>
+        <article class="showcase-card reveal" data-lightbox="assets/vaulx-feature-3.jpg" tabindex="0" role="button" aria-label="Open analytics preview">
+          <img src="assets/vaulx-feature-3.jpg" alt="Vaulx spending analytics" loading="lazy" width="942" height="1667">
+          <div class="showcase-meta"><strong>Smart analytics</strong><span>Clear patterns</span></div>
+        </article>
+        <article class="showcase-card reveal" data-lightbox="assets/vaulx-feature-4.jpg" tabindex="0" role="button" aria-label="Open Vaulx Score preview">
+          <img src="assets/vaulx-feature-4.jpg" alt="Vaulx Score levels and AI evaluation" loading="lazy" width="942" height="1667">
+          <div class="showcase-meta"><strong>Vaulx Score</strong><span>Gamified habits</span></div>
+        </article>
+        <article class="showcase-card reveal" data-lightbox="assets/vaulx-feature-5.jpg" tabindex="0" role="button" aria-label="Open budget planner preview">
+          <img src="assets/vaulx-feature-5.jpg" alt="Vaulx Budget Planner" loading="lazy" width="942" height="1667">
+          <div class="showcase-meta"><strong>Budget Planner</strong><span>Plan ahead</span></div>
+        </article>
+        <article class="showcase-card reveal" data-lightbox="assets/vaulx-feature-6.jpg" tabindex="0" role="button" aria-label="Open custom categories preview">
+          <img src="assets/vaulx-feature-6.jpg" alt="Vaulx customizable expense categories" loading="lazy" width="942" height="1667">
+          <div class="showcase-meta"><strong>Custom categories</strong><span>Your rules</span></div>
+        </article>
+        <article class="showcase-card reveal" data-lightbox="assets/vaulx-feature-1.jpg" tabindex="0" role="button" aria-label="Open loyalty cards preview">
+          <img src="assets/vaulx-feature-1.jpg" alt="Vaulx loyalty card wallet" loading="lazy" width="942" height="1667">
+          <div class="showcase-meta"><strong>Loyalty cards</strong><span>Always ready</span></div>
+        </article>
+      </div>
+    </section>
+
+    <section id="privacy" class="section page-shell">
+      <div class="privacy-wrap reveal">
+        <div class="privacy-intro">
+          <p class="eyebrow">Privacy policy</p>
+          <h2>Financial data stays <span class="gradient">yours.</span></h2>
+          <p>
+            Last updated: 21 June 2026. Vaulx is designed as a local-first application.
+            Core features work without an account, advertising profile or analytics SDK.
+          </p>
+          <p><strong>Contact:</strong> vaulxapp@gmail.com</p>
+        </div>
+
+        <div class="privacy-points">
+          <article>
+            <h3>Local encrypted storage</h3>
+            <p>Expenses, categories, budgets, recurring expenses, loyalty cards, levels and quests are stored on the device in an SQLCipher-protected database or encrypted Android storage.</p>
+          </article>
+          <article>
+            <h3>No analytics or advertising</h3>
+            <p>Vaulx does not include advertising SDKs, behavioral analytics or third-party profiling tools.</p>
+          </article>
+          <article>
+            <h3>Camera processing</h3>
+            <p>The camera is used only when the user chooses to scan a barcode or QR code. Recognition happens on-device and captured frames are not stored or transmitted by Vaulx.</p>
+          </article>
+          <article>
+            <h3>Manual encrypted backup</h3>
+            <p>A backup is created only on request, encrypted using the recovery password and shared only through the destination selected by the user.</p>
+          </article>
+          <article>
+            <h3>No internet required for core use</h3>
+            <p>Tracking expenses, viewing statistics, managing budgets, loyalty cards, backups and restores does not require a Vaulx account.</p>
+          </article>
+          <article>
+            <h3>User control</h3>
+            <p>Users can modify or delete their records and erase all local app data from Settings at any time.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="support" class="section page-shell">
+      <div class="support-grid">
+        <div class="support-copy reveal">
+          <p class="eyebrow">Help improve Vaulx</p>
+          <h2>Found something<br><span class="gradient">out of place?</span></h2>
+          <p>
+            Tell us what happened and which device you used. Reports are delivered
+            securely through HTTPS to Vaulx support.
+          </p>
+        </div>
+
+        <form id="bugForm" class="bug-form reveal" action="https://formsubmit.co/vaulxapp@gmail.com" method="POST">
+          <input type="hidden" name="_subject" value="Vaulx bug report">
+          <input type="hidden" name="_template" value="table">
+          <input type="hidden" name="_captcha" value="false">
+
+          <label for="name">Name</label>
+          <input id="name" name="name" type="text" placeholder="Your name" autocomplete="name" required>
+
+          <label for="email">Contact email (optional)</label>
+          <input id="email" name="email" type="email" placeholder="you@example.com" autocomplete="email">
+
+          <label for="device">Device and Android version</label>
+          <input id="device" name="device" type="text" placeholder="Xiaomi 15T Pro, Android 15" required>
+
+          <label for="message">Describe the issue</label>
+          <textarea id="message" name="message" rows="5" placeholder="What happened, where did it happen, and how can we reproduce it?" required></textarea>
+
+          <button class="button primary full" type="submit">Send bug report</button>
+          <p class="form-note">
+            Reports are sent to vaulxapp@gmail.com. Never include PINs, recovery passwords,
+            full loyalty card codes or private financial information.
+          </p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div><strong>VAULX</strong> &middot; Track More, Guess Less.</div>
+    <div>Private by design &middot; Built for Android</div>
+  </footer>
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Screenshot preview">
+    <button class="lightbox-close" type="button" aria-label="Close preview">&times;</button>
+    <img src="" alt="Vaulx feature preview">
+  </div>
+
+  <script>
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll(".reveal").forEach((element) => revealObserver.observe(element));
+
+    const lightbox = document.getElementById("lightbox");
+    const lightboxImage = lightbox.querySelector("img");
+
+    function openPreview(card) {
+      lightboxImage.src = card.dataset.lightbox;
+      lightboxImage.alt = card.querySelector("img").alt;
+      lightbox.classList.add("open");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closePreview() {
+      lightbox.classList.remove("open");
+      lightboxImage.src = "";
+      document.body.style.overflow = "";
+    }
+
+    document.querySelectorAll("[data-lightbox]").forEach((card) => {
+      card.addEventListener("click", () => openPreview(card));
+      card.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          openPreview(card);
+        }
+      });
+    });
+
+    lightbox.querySelector("button").addEventListener("click", closePreview);
+    lightbox.addEventListener("click", (event) => {
+      if (event.target === lightbox) closePreview();
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") closePreview();
+    });
+  </script>
+</body>
+</html>
